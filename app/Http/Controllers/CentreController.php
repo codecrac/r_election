@@ -24,12 +24,12 @@ class CentreController extends Controller
             $le_nombre = NombreInscritCentreElections::where(
                 [
                     'centre_id' => auth()->user()->id,
-                    'election_id' => $this->id_election,
+                    'election_id' => auth()->user()->election_id,
                 ]
             )->first();
 
             if($le_nombre !=null){
-                $le_nombre->nombre_electeurs_attendus = $df['electeurs_attendus'];
+                $le_nombre->nombre_electeurs_attendus = $df['nombre_electeurs_inscrits'];
                 $le_nombre->save();
             }else{
                 NombreInscritCentreElections::create(

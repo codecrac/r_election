@@ -29,7 +29,7 @@
                                     <div class="row">
                                         <div class="col-1" ></div>
                                         <div class="col-3"> <label >Nombres electeurs Inscrits</label> </div>
-                                        <div class="col-4"> <input type="number" value="{{ auth()->user()->centre->electeurs_inscrit(auth()->user()->election_id)}}" name="nb_inscrit" class="form-control" id="email1" required></div>
+                                        <div class="col-4"> <input type="number" value="{{ auth()->user()->centre->electeurs_inscrit(auth()->user()->election_id)}}" name="nombre_electeurs_inscrits" class="form-control" id="email1" required></div>
                                     </div>
                                     <br/>
                                 </div>

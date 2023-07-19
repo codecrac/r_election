@@ -32,12 +32,62 @@ Route::middleware([
             $nom_election_en_cours = $lelection_en_cours->nom;
         }
 
-        $nombre_total_inscrit = auth()->user()->centre->electeurs_inscrit(auth()->user()->election_id);
-        $nombre_total_votants = \App\Models\ParticipationElectionCentre::where('election_id',auth()->user()->election_id)->where('centre_id',auth()->user()->centre_id)->sum('electeurs_effectif');
-        $nombre_total_bulletin_nuls = \App\Models\ParticipationElectionCentre::where('election_id',auth()->user()->election_id)->where('centre_id',auth()->user()->centre_id)->sum('bulletin_null');
-        $nombre_total_bulletin_blancs = \App\Models\ParticipationElectionCentre::where('election_id',auth()->user()->election_id)->where('centre_id',auth()->user()->centre_id)->sum('bulletin_blanc');
+        if(auth()->user()->user_type == 'agent') {
+            $id_election = auth()->user()->election_id;
+            $id_centre = auth()->user()->centre_id;
+        }else {
 
-        return view('dashboard',compact('nom_election_en_cours','nombre_total_inscrit','nombre_total_votants','nombre_total_bulletin_blancs','nombre_total_bulletin_nuls')); }
+            $id_election = $lelection_en_cours == null ? 0 : $lelection_en_cours->id;
+            $id_centre = null;
+        }
+
+        $liste_candidat = \App\Models\Candidat::where('election_id',$id_election)->get();
+
+
+        $is_admin = true;
+        if(auth()->user()->user_type == 'agent') {
+            $nombre_total_inscrit = auth()->user()->centre->electeurs_inscrit($id_election);
+            $nombre_total_votants = \App\Models\ParticipationElectionCentre::where('election_id',$id_election)->where('centre_id',$id_centre)->sum('electeurs_effectif');
+            $nombre_total_bulletin_nuls = \App\Models\ParticipationElectionCentre::where('election_id',$id_election)->where('centre_id',$id_centre)->sum('bulletin_null');
+            $nombre_total_bulletin_blancs = \App\Models\ParticipationElectionCentre::where('election_id',$id_election)->where('centre_id',$id_centre)->sum('bulletin_blanc');
+
+
+            $tableau_stats_votes = [];
+            foreach ($liste_candidat as $item_candidat){
+                $tableau_stats_votes[] = [
+                    'country' => $item_candidat->nom . ' ( '.round($item_candidat->nombre_de_voix_en_tout_le_centre($id_centre) /($nombre_total_votants == 0? 1: $nombre_total_votants) *100,2) .'%) ',
+                    'visits' => $item_candidat->nombre_de_voix_en_tout_le_centre($id_centre)
+                ] ;
+            }
+            $is_admin = false;
+        }else{
+
+            $nombre_total_inscrit = \App\Models\NombreInscritCentreElections::where('election_id',$id_election)->sum('nombre_electeurs_attendus');
+            $nombre_total_votants = \App\Models\ParticipationElectionCentre::where('election_id',$id_election)->sum('electeurs_effectif');
+            $nombre_total_bulletin_nuls = \App\Models\ParticipationElectionCentre::where('election_id',$id_election)->sum('bulletin_null');
+            $nombre_total_bulletin_blancs = \App\Models\ParticipationElectionCentre::where('election_id',$id_election)->sum('bulletin_blanc');
+
+
+            $tableau_stats_votes = [];
+            foreach ($liste_candidat as $item_candidat){
+
+                $tableau_stats_votes[] = [
+                    'country' => $item_candidat->nom . ' ( '.round($item_candidat->nombre_de_voix_election($id_election) /($nombre_total_votants == 0? 1: $nombre_total_votants) *100,2) .'%) ',
+                    'visits' => $item_candidat->nombre_de_voix_election($id_election)
+                ] ;
+            }
+        }
+
+
+
+//        dd($tableau_stats_votes);
+
+        return view('dashboard',compact(
+                'nom_election_en_cours','nombre_total_inscrit',
+                'nombre_total_votants','nombre_total_bulletin_blancs','nombre_total_bulletin_nuls',
+                'tableau_stats_votes','is_admin','lelection_en_cours'
+            )
+        ); }
     )->name('dashboard');
 
     Route::prefix('/election')->group( function (){
@@ -45,6 +95,7 @@ Route::middleware([
         Route::post('/creer', [ELectionController::class,'post_creer']);
         Route::get('/liste', [ELectionController::class,'index'])->name('election.liste');
         Route::get('/details/{id_election}', [ELectionController::class,'details_election'])->name('election.details');
+        Route::post('/details/{id_election}', [ELectionController::class,'post_details_election']);
 
         // Gestion
             // candidats

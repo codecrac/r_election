@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
 
-<!-- Mirrored from templates.iqonic.design/findash/html/dashboard-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 31 Oct 2022 09:56:28 GMT -->
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -52,11 +51,11 @@
 
                     @if(auth()->user()->user_type == "su_admin")
 
-                        <li>
+                        {{--<li>
                             <a href="{{route('zone.liste')}}" ><span
                                     class="ripple rippleEffect"></span><i class="las la-home iq-arrow-left"></i><span>Zones de vote</span>
                             </a>
-                        </li>
+                        </li>--}}
                         <li>
                             <a href="{{route('election.liste')}}" ><span
                                     class="ripple rippleEffect"></span><i class="las la-home iq-arrow-left"></i><span>Election</span>
@@ -238,5 +237,4 @@
 @yield('script_complemeantaire')
 </body>
 
-<!-- Mirrored from templates.iqonic.design/findash/html/dashboard-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 31 Oct 2022 09:56:29 GMT -->
 </html>

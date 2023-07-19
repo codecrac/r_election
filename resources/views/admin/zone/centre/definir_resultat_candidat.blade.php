@@ -67,7 +67,7 @@
                                                             <div>
                                                                 <label>Nombre de voix</label> <br/>
                                                                 <input type="hidden" class="form-control" name="id_candidat[]" value="{{$item_candidat->id}}" />
-                                                                <input class="form-control" name="nombre_de_voix[]" value="{{$item_candidat->nombre_de_voix_centre(auth()->user()->centre_id,$date_decompte)}}" />
+                                                                <input class="form-control" name="nombre_de_voix[]" value="{{$item_candidat->nombre_de_voix_centre_date(auth()->user()->centre_id,$date_decompte)}}" />
                                                             </div>
                                                         </div>
                                                     @endforeach

@@ -40,10 +40,6 @@ class ZoneDeVoteImport implements ToModel, WithHeadingRow
                     'zone_id' => $la_zone->id,
                     'nom' => $row['centre'],
                 ]);
-            }else{
-                $le_centre->update([
-                    'electeurs_attendus' => $row['nombre_electeurs_inscrits'] ?? null
-                ]);
             }
 
             $le_nombre = NombreInscritCentreElections::where(
@@ -74,8 +70,7 @@ class ZoneDeVoteImport implements ToModel, WithHeadingRow
                 'user_type' => "agent",
                 'election_id' => $this->id_election,
                 'name' => $row['chef_de_centre'],
-                'centre_id' => $le_centre->id,
-
+                'centre_id' => $le_centre->id
             ])->first();
 
             if($lagent_existant == null){
@@ -90,6 +85,11 @@ class ZoneDeVoteImport implements ToModel, WithHeadingRow
                     'password' => Hash::make('1234'),
                     'centre_id' => $le_centre->id,
                     'election_id' => $this->id_election,
+                    'telephone' => $row['telephone'] ?? null
+                ]);
+            }else{
+                $lagent_existant->update([
+                    'telephone' => $row['telephone'] ?? null
                 ]);
             }
 
